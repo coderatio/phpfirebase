@@ -1,0 +1,22 @@
+{
+    "name": "coderatio/phpfirebase",
+    "description": "A simple and clean CRUD PHP library for Google Firebase datastore",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Josiah Yahaya",
+            "email": "josiahoyahaya@gmail.com"
+        }
+    ],
+    "autoload": {
+        "classmap": [
+            "src"
+        ]
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "kreait/firebase-php": "^4.0",
+        "php": "^7.0"
+    }
+}
