@@ -18,5 +18,8 @@
     "require": {
         "kreait/firebase-php": "^4.0",
         "php": "^7.0"
+    },
+    "require-dev": {
+        "coderatio/phpfirebase": "dev-master"
     }
 }
