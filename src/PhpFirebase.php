@@ -13,9 +13,10 @@ use Kreait\Firebase\ServiceAccount;
 
 class PhpFirebase {
     protected $database;
-    protected $table = 'users';
+    protected $table = 'records';
+
     /**
-     * Please set create your secret key and replace this path to your key.
+     * The class constructor. We get our firebase database ready here.
      *
      * @var string
      */
@@ -26,6 +27,12 @@ class PhpFirebase {
         $this->database = $firebase->getDatabase();
     }
 
+    /**
+     * The function creates a table in the firebase datastore.
+     *
+     * @param string $table
+     * @return $this
+     */
     public function setTable(string $table)
     {
         $this->table = $table;
@@ -34,18 +41,16 @@ class PhpFirebase {
     }
 
     /**
-     * This function returns all users
+     * This function returns all records
      *
      * @return mixed
      */
     public function getRecords(){
-        return $this->database->getReference($this->table)
-            ->getSnapshot()
-            ->getValue();
+        return $this->database->getReference($this->table)->getValue();
     }
 
     /**
-     * This function returns a specific user by id
+     * This function returns a specific record by id
      *
      * @param int $recordID
      * @return null|array
@@ -62,12 +67,12 @@ class PhpFirebase {
     }
 
     /**
-     * This function adds new users|user
-     * It will return bool or inserted users
+     * This function adds new records|record
+     * It will return this or inserted records if $returnData is set true.
      *
      * @param array $data
      * @param bool $returnData
-     * @return bool|mixed
+     * @return $this|mixed
      */
     public function insertRecords(array $data, $returnData = false) {
 
@@ -86,23 +91,28 @@ class PhpFirebase {
     }
 
     /**
-     * This function updates a user
-     * It will return updated data from the users table
+     * This function updates a record
+     * It will return updated records
      *
      * @param int $recordID
      * @param array $data
-     * @return mixed
+     * @return array
      */
-    public function updateRecords(int $recordID, array $data)
+    public function updateRecord(int $recordID, array $data)
     {
         $records = $this->getRecords();
         foreach ($records as $key => $record) {
             if ($recordID == $record['id']) {
-                $data['id'] = $recordID;
+                foreach ($data as $dataKey => $dataValue) {
+                    if (isset($record[$dataKey])) {
+                        $record[$dataKey] = $dataValue;
+                    }
+                }
+
                 $this->database->getReference()
                     ->getChild($this->table)
                     ->getChild($key)
-                    ->set($data);
+                    ->set($record);
             }
         }
 
@@ -110,16 +120,14 @@ class PhpFirebase {
     }
 
     /**
-     * This function deletes a user from your database.
+     * This function deletes a record from your database.
      * It will return boolean after action was commited
      *
      * @param int $recordID
      * @return bool
      */
     public function deleteRecord(int $recordID) {
-
-        $records = $this->getRecords();
-        foreach ($records as $key => $record) {
+        foreach ($this->getRecords() as $key => $record) {
             if ($record['id'] == $recordID) {
                 $this->database->getReference()
                     ->getChild($this->table)
