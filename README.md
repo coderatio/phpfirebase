@@ -16,13 +16,11 @@ use Coderatio\PhpFirebase\PhpFirebase;
 
 $pfb = new PhpFirebase();
 $pfb->setTable('posts');
-$pfb->addRecords([
-  [
-    'id' => 1,
+$pfb->insertRecord([
     'title' => 'Post one',
     'body' => 'Post one contents'
-  ]
-])
+  ], $returnData);
+  //The $returnData which is boolean returns inserted data if set to true. Default is false.
 ```
 
 ## Reading records (R)
