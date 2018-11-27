@@ -3,7 +3,7 @@ A simple and clean CRUD PHP library for Google Firebase datastore.
 This library, allows you to create, read, update and delete records stored on your Google Firebase database.
 
 ## Installation
-To intall the library, kindly execute the command `composer require coderatio/phpfirebase:v1.0-beta.1`.
+To intall the library, kindly execute the command `composer require coderatio/phpfirebase:v1.0` Or `composer require coderatio/phpfirebase`.
 
 ## How to use
 To start using, make sure you open vendor folder => coderatio => phpfirebase => src => secrete and update the contents of the key with your Google firebase service account key.
