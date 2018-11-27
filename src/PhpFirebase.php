@@ -14,6 +14,9 @@ use Kreait\Firebase\ServiceAccount;
 class PhpFirebase {
     protected $database;
     protected $table = 'records';
+    public $primaryKey = 'id';
+    protected $firebase;
+    public $secretKeyJsonPath = '';
 
     /**
      * The class constructor. We get our firebase database ready here.
@@ -21,10 +24,34 @@ class PhpFirebase {
      * @var string
      */
     public function __construct() {
-        $serviceAccount = ServiceAccount::fromJsonFile(__DIR__ . Engine::$secretKeyPath);
-        $firebase = (new Factory)->withServiceAccount($serviceAccount)->create();
+        $this->secretKeyJsonPath = Engine::$secretKeyPath;
+        $serviceAccount = ServiceAccount::fromJsonFile(__DIR__ . $this->secretKeyJsonPath);
+        $this->firebase = (new Factory)->withServiceAccount($serviceAccount)->create();
 
-        $this->database = $firebase->getDatabase();
+        $this->database = $this->firebase->getDatabase();
+    }
+
+    /**
+     * Set the path to your Google service account service key json file
+     *
+     * @param $keyJsonFilePath
+     * @return $this
+     */
+    public function setSecretKeyJsonFilePath($keyJsonFilePath)
+    {
+        $this->secretKeyJsonPath = $keyJsonFilePath;
+
+        return $this;
+    }
+
+    /**
+     * Use library dependent factory
+     *
+     * @return \Kreait\Firebase
+     */
+    public function factory()
+    {
+        return $this->firebase;
     }
 
     /**
@@ -36,6 +63,19 @@ class PhpFirebase {
     public function setTable(string $table)
     {
         $this->table = $table;
+
+        return $this;
+    }
+
+    /**
+     * Set the primary key to be used for crud actions
+     *
+     * @param string $primaryKey
+     * @return $this
+     */
+    public function setPrimaryKey(string $primaryKey)
+    {
+        $this->primaryKey = $primaryKey;
 
         return $this;
     }
@@ -58,7 +98,7 @@ class PhpFirebase {
     public function getRecord(int $recordID)
     {
         foreach ($this->getRecords() as $key => $record) {
-            if ($record['id'] == $recordID) {
+            if ($record[$this->primaryKey] == $recordID) {
                 return $record;
             }
         }
@@ -73,18 +113,19 @@ class PhpFirebase {
      * @param array $data
      * @param bool $returnData
      * @return $this|mixed
+     * @throws \Exception
      */
-    public function insertRecords(array $data, $returnData = false) {
-
-        foreach ($data as $key => $value){
-            $this->database->getReference()
-                ->getChild($this->table)
-                ->getChild($key)
-                ->set($value);
-        }
+    public function insertRecord(array $data, $returnData = false)
+    {
+        $countedRecords = count($this->getRecords());
+        $data[$this->primaryKey] = $countedRecords > 1 ? $countedRecords + 1 : 1;
+        $this->database->getReference()
+            ->getChild($this->table)
+            ->getChild($countedRecords)
+            ->set($data);
 
         if ($returnData) {
-            return $this->getRecords();
+            return $this->getRecord($data[$this->primaryKey]);
         }
 
         return $this;
@@ -100,9 +141,8 @@ class PhpFirebase {
      */
     public function updateRecord(int $recordID, array $data)
     {
-        $records = $this->getRecords();
-        foreach ($records as $key => $record) {
-            if ($recordID == $record['id']) {
+        foreach ($this->getRecords() as $key => $record) {
+            if ($recordID == $record[$this->primaryKey]) {
                 foreach ($data as $dataKey => $dataValue) {
                     if (isset($record[$dataKey])) {
                         $record[$dataKey] = $dataValue;
@@ -116,7 +156,7 @@ class PhpFirebase {
             }
         }
 
-        return $this->getRecords();
+        return $this->getRecord($recordID);
     }
 
     /**
@@ -141,5 +181,3 @@ class PhpFirebase {
         return false;
     }
 }
-
-
