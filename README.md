@@ -6,7 +6,7 @@ This library, allows you to create, read, update and delete records stored on yo
 To intall the library, kindly execute the command `composer require coderatio/phpfirebase:v1.0` Or `composer require coderatio/phpfirebase`.
 
 ## How to use
-To start using, make sure you open vendor folder => coderatio => phpfirebase => src => secrete and update the contents of the key with your Google firebase service account key.
+To start using, make sure you create a folder and save your Google Firebase service account key json file.
 
 ## Creating new records (C)
 To create new record, do this...
@@ -14,7 +14,7 @@ To create new record, do this...
 require 'vendor/autoload';
 use Coderatio\PhpFirebase\PhpFirebase;
 
-$pfb = new PhpFirebase();
+$pfb = new PhpFirebase($pathToSecretKeyJsonFile);
 $pfb->setTable('posts');
 $pfb->insertRecord([
     'title' => 'Post one',
